@@ -197,6 +197,14 @@ Object.entries(byDay).forEach(([d,vs])=>{const el=document.createElement('div');
  el.innerHTML=`<h3>Hari ${d} <span>${vs[0].when.split(',')[0]}</span></h3>`+vs.map(v=>`<label class="slot${done[v.n]?' done':''}"><input type="checkbox" id="ck${v.n}" ${done[v.n]?'checked':''}><a href="#v${String(v.n).padStart(2,'0')}">${v.e} ${v.n}. ${esc(v.t)}</a><small>${v.when.split(', ')[1]}</small></label>`).join('');
  daysEl.appendChild(el)});
 daysEl.addEventListener('change',e=>{if(e.target.type!=='checkbox')return;const n=e.target.id.slice(2);done[n]=e.target.checked;e.target.closest('.slot').classList.toggle('done',e.target.checked);try{localStorage.setItem('done',JSON.stringify(done))}catch(x){}});
+// downloads capability (artifact): fetch own file and hand to viewer; fallback = link to public copy
+let DL=null;
+g.addEventListener('click',async e=>{const a=e.target.closest('.dlbtn');if(!a||!DL)return;e.preventDefault();
+ const id=a.closest('.card').id, lab=a.textContent;a.textContent='Menyediakan video…';
+ try{const r=await fetch('videos/'+id+'.mp4');if(!r.ok)throw {code:'fetch'};const b=await r.blob();
+  await DL.save({filename:'PIBG_SKBUD4_'+id+'.mp4',data:b});a.textContent='Disimpan ✓';setTimeout(()=>a.textContent=lab,2500)}
+ catch(err){const c=err&&err.code;if(c==='declined'){a.textContent=lab}else if(c==='rate_limited'){a.textContent='Tunggu sebentar, cuba lagi';setTimeout(()=>a.textContent=lab,2500)}else{a.textContent=lab;window.open?.(a.href,'_blank')}}
+});
 // pause other videos when one plays
 g.addEventListener('play',e=>{g.querySelectorAll('video').forEach(x=>{if(x!==e.target)x.pause()})},true);
 const fs=document.querySelectorAll('.f'), cnt=document.getElementById('count');
