@@ -161,10 +161,10 @@ const SH={wa:{c:'var(--wa)',l:'Hantar ke WhatsApp',u:t=>'https://wa.me/?text='+e
 const g=document.getElementById('grid');
 const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 DATA.forEach(v=>{
- const id='v'+String(v.n).padStart(2,'0'); const tid='t'+String(v.n).padStart(2,'0');
+ const id='v'+String(v.n).padStart(2,'0'); const tid='t'+String(v.n).padStart(2,'0'); const VB=v.n>=27?DLBASE:'';
  const c=document.createElement('article'); c.className='card'; c.dataset.s=v.s; c.id=id;
  c.innerHTML=`<div class="player"><span class="num" style="background:${COLORS[v.n%4]}">${v.n}</span>
-  <video controls playsinline preload="none" poster="thumbs/${tid}.jpg" src="videos/${id}.mp4" aria-label="Video ${v.n}: ${esc(v.t)}"></video>
+  <video controls playsinline preload="none" poster="thumbs/${tid}.jpg" src="${VB}videos/${id}.mp4" aria-label="Video ${v.n}: ${esc(v.t)}"></video>
   <div class="meta"><span class="pill">${v.dur} saat</span><span class="pill">${v.mb} MB</span><span class="pill">9:16</span><span class="pill when">🗓️ ${v.when}</span></div><a class="dlbtn" href="${DLBASE}videos/${id}.mp4" download="PIBG_SKBUD4_${id}.mp4" >⬇ Muat turun video</a></div>
   <div class="body"><div class="series">${v.s===3?"Isu Semasa":v.s===4?"Bantuan KPM":"Siri "+v.s} · Video ${v.n}</div><h2>${v.e} ${esc(v.t)}</h2><p class="key">${esc(v.key)}</p>
   ${v.note?`<p class="note">Nota fakta: ${esc(v.note)}</p>`:''}
@@ -203,7 +203,7 @@ daysEl.addEventListener('change',e=>{if(e.target.type!=='checkbox')return;const 
 let DL=null;
 g.addEventListener('click',async e=>{const a=e.target.closest('.dlbtn');if(!a||!DL)return;e.preventDefault();
  const id=a.closest('.card').id, lab=a.textContent;a.textContent='Menyediakan video…';
- try{const r=await fetch('videos/'+id+'.mp4');if(!r.ok)throw {code:'fetch'};const b=await r.blob();
+ try{const r=await fetch((+id.slice(1)>=27?DLBASE:'')+'videos/'+id+'.mp4');if(!r.ok)throw {code:'fetch'};const b=await r.blob();
   await DL.save({filename:'PIBG_SKBUD4_'+id+'.mp4',data:b});a.textContent='Disimpan ✓';setTimeout(()=>a.textContent=lab,2500)}
  catch(err){const c=err&&err.code;if(c==='declined'){a.textContent=lab}else if(c==='rate_limited'){a.textContent='Tunggu sebentar, cuba lagi';setTimeout(()=>a.textContent=lab,2500)}else{a.textContent=lab;window.open?.(a.href,'_blank')}}
 });
